@@ -10,6 +10,7 @@
     hoverStateFilter,
   } from "svelte-maplibre";
   import Layout from "./Layout.svelte";
+  import SummarizeProperties from "./SummarizeProperties.svelte";
 
   let empty = {
     type: "FeatureCollection" as const,
@@ -19,6 +20,7 @@
 
   let map;
   let pinnedFeature = null;
+  let colorBy = "black";
 
   $: if (map) {
     map.on("click", onClick);
@@ -48,6 +50,7 @@
       }
 
       gj = json;
+      pinnedFeature = null;
     } catch (err) {
       window.alert(`Bad input file: ${err}`);
     }
@@ -68,6 +71,11 @@
     {#if pinnedFeature}
       <JsonView json={pinnedFeature.properties} />
     {/if}
+
+    <SummarizeProperties
+      input={gj.features.map((f) => f.properties)}
+      bind:colorBy
+    />
   </div>
   <div slot="main" style="position:relative; width: 100%; height: 100vh;">
     <MapLibre
@@ -81,9 +89,10 @@
           id="polygons"
           filter={["==", ["geometry-type"], "Polygon"]}
           manageHoverState
+          eventsIfTopMost
           hoverCursor="pointer"
           paint={{
-            "fill-color": "red",
+            "fill-color": colorBy,
             "fill-opacity": hoverStateFilter(0.5, 1.0),
           }}
         />
@@ -92,10 +101,11 @@
           id="lines"
           filter={["==", ["geometry-type"], "LineString"]}
           manageHoverState
+          eventsIfTopMost
           hoverCursor="pointer"
           paint={{
             "line-width": 8,
-            "line-color": "black",
+            "line-color": colorBy,
             "line-opacity": hoverStateFilter(0.5, 1.0),
           }}
         />
@@ -104,10 +114,11 @@
           id="points"
           filter={["==", ["geometry-type"], "Point"]}
           manageHoverState
+          eventsIfTopMost
           hoverCursor="pointer"
           paint={{
             "circle-radius": 10,
-            "circle-color": "black",
+            "circle-color": colorBy,
             "circle-opacity": hoverStateFilter(0.5, 1.0),
           }}
         />
