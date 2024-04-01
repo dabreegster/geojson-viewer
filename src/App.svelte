@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { JsonView } from "@zerodevx/svelte-json-view";
   import type { MapMouseEvent } from "maplibre-gl";
   import {
     FillLayer,
@@ -66,7 +67,7 @@
     <p>Note feature IDs are overwritten</p>
 
     {#if pinnedFeature}
-      <PropertiesTable properties={pinnedFeature.properties} />
+      <JsonView json={pinnedFeature.properties} />
     {/if}
   </div>
   <div slot="main" style="position:relative; width: 100%; height: 100vh;">
