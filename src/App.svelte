@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { MapMouseEvent } from "maplibre-gl";
   import {
     FillLayer,
     GeoJSON,
@@ -16,11 +17,37 @@
     features: [],
   };
 
+  let map;
+  let pinnedFeature = null;
+
+  $: if (map) {
+    map.on("click", onClick);
+  }
+
+  function onClick(e: MapMouseEvent) {
+    pinnedFeature = null;
+    for (let rendered of map.queryRenderedFeatures(e.point, {
+      layers: ["points", "lines", "polygons"],
+    })) {
+      // Find the original feature in the GJ, to avoid having to parse nested properties
+      pinnedFeature = gj.features.find((f) => f.id == rendered.id);
+      break;
+    }
+  }
+
   let fileInput: HTMLInputElement;
   async function loadFile(e: Event) {
     try {
       let text = await fileInput.files![0].text();
-      gj = JSON.parse(text);
+      let json = JSON.parse(text);
+
+      // Overwrite feature IDs
+      let id = 1;
+      for (let f of json.features) {
+        f.id = id++;
+      }
+
+      gj = json;
     } catch (err) {
       window.alert(`Bad input file: ${err}`);
     }
@@ -37,15 +64,21 @@
     </label>
 
     <p>Note feature IDs are overwritten</p>
+
+    {#if pinnedFeature}
+      <PropertiesTable properties={pinnedFeature.properties} />
+    {/if}
   </div>
   <div slot="main" style="position:relative; width: 100%; height: 100vh;">
     <MapLibre
       style="https://api.maptiler.com/maps/dataviz/style.json?key=MZEJTanw3WpxRvt7qDfo"
       standardControls
       hash
+      bind:map
     >
-      <GeoJSON data={gj} generateId>
+      <GeoJSON data={gj}>
         <FillLayer
+          id="polygons"
           filter={["==", ["geometry-type"], "Polygon"]}
           manageHoverState
           paint={{
@@ -59,6 +92,7 @@
         </FillLayer>
 
         <LineLayer
+          id="lines"
           filter={["==", ["geometry-type"], "LineString"]}
           manageHoverState
           paint={{
@@ -73,6 +107,7 @@
         </LineLayer>
 
         <CircleLayer
+          id="points"
           filter={["==", ["geometry-type"], "Point"]}
           manageHoverState
           paint={{
