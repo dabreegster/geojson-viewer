@@ -8,15 +8,14 @@
     LineLayer,
     CircleLayer,
     hoverStateFilter,
-    Popup,
   } from "svelte-maplibre";
   import Layout from "./Layout.svelte";
-  import PropertiesTable from "./PropertiesTable.svelte";
 
-  let gj = {
+  let empty = {
     type: "FeatureCollection" as const,
     features: [],
   };
+  let gj = empty;
 
   let map;
   let pinnedFeature = null;
@@ -82,45 +81,59 @@
           id="polygons"
           filter={["==", ["geometry-type"], "Polygon"]}
           manageHoverState
+          hoverCursor="pointer"
           paint={{
             "fill-color": "red",
             "fill-opacity": hoverStateFilter(0.5, 1.0),
           }}
-        >
-          <Popup openOn="hover" let:data>
-            <PropertiesTable properties={data.properties} />
-          </Popup>
-        </FillLayer>
+        />
 
         <LineLayer
           id="lines"
           filter={["==", ["geometry-type"], "LineString"]}
           manageHoverState
+          hoverCursor="pointer"
           paint={{
             "line-width": 8,
             "line-color": "black",
             "line-opacity": hoverStateFilter(0.5, 1.0),
           }}
-        >
-          <Popup openOn="hover" let:data>
-            <PropertiesTable properties={data.properties} />
-          </Popup>
-        </LineLayer>
+        />
 
         <CircleLayer
           id="points"
           filter={["==", ["geometry-type"], "Point"]}
           manageHoverState
+          hoverCursor="pointer"
           paint={{
             "circle-radius": 10,
             "circle-color": "black",
             "circle-opacity": hoverStateFilter(0.5, 1.0),
           }}
-        >
-          <Popup openOn="hover" let:data>
-            <PropertiesTable properties={data.properties} />
-          </Popup>
-        </CircleLayer>
+        />
+      </GeoJSON>
+
+      <GeoJSON data={pinnedFeature || empty}>
+        <FillLayer
+          filter={["==", ["geometry-type"], "Polygon"]}
+          paint={{
+            "fill-color": "red",
+          }}
+        />
+        <LineLayer
+          filter={["==", ["geometry-type"], "LineString"]}
+          paint={{
+            "line-width": 8,
+            "line-color": "red",
+          }}
+        />
+        <CircleLayer
+          filter={["==", ["geometry-type"], "Point"]}
+          paint={{
+            "circle-radius": 10,
+            "circle-color": "red",
+          }}
+        />
       </GeoJSON>
     </MapLibre>
   </div>
