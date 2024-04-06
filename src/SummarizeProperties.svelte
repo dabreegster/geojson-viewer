@@ -2,17 +2,13 @@
   import { summarize } from "./summarize";
   import Legend from "./Legend.svelte";
 
-  export let input;
+  export let input: any[];
   export let colorBy = "black";
 
   let chosenKey = null;
   let legendRows = [];
 
-  // TODO Maybe https://www.npmjs.com/package/json-summary or similar?
-
-  $: keys = oldSummarize(input);
-
-  $: summarize(input);
+  $: summaries = summarize(input, 15);
 
   $: if (chosenKey) {
     colorBy = makeExpression(chosenKey);
@@ -21,23 +17,9 @@
     legendRows = [];
   }
 
-  function oldSummarize(input): Set<string> {
-    let keys = new Set();
-    for (let obj of input) {
-      for (let [k, v] of Object.entries(obj)) {
-        keys.add(k);
-      }
-    }
-    return keys;
-  }
-
+  // TODO Handle nested keys
   function makeExpression(key: string) {
-    let values = new Set();
-    for (let obj of input) {
-      if (key in obj) {
-        values.add(obj[key]);
-      }
-    }
+    let categories = summaries.get(key).categorical;
 
     // Vivid from https://carto.com/carto-colors/
     let colors = [
@@ -59,9 +41,9 @@
 
     let expr = ["case"];
     let i = 0;
-    for (let value of values) {
+    for (let [value, count] of categories) {
       let color = colors[i++ % colors.length];
-      legendRows.push([value, color]);
+      legendRows.push([`${value} (${count})`, color]);
 
       expr.push(["==", ["get", key], value]);
       expr.push(color);
@@ -78,7 +60,7 @@
 <p>{input.length.toLocaleString()} features</p>
 <p>Properties:</p>
 <ul>
-  {#each keys as key}
+  {#each summaries.entries() as [key, summary]}
     {#if chosenKey == key}
       <li>
         {key}
@@ -86,16 +68,31 @@
           >Stop coloring by this</button
         >
       </li>
+      <Legend rows={legendRows} />
     {:else if chosenKey}
       <li>{key}</li>
-    {:else}
+    {:else if summary.categorical && !key.includes("[]")}
       <li>
         {key} <button on:click={() => (chosenKey = key)}>Color by this</button>
       </li>
+    {:else}
+      <li>{key}</li>
+    {/if}
+
+    {#if chosenKey != key}
+      <ul>
+        {#if summary.categorical}
+          {#each summary.categorical.entries() as [value, count]}
+            <li>{value}: {count}</li>
+          {/each}
+        {:else if summary.strings}
+          <li>{summary.strings} strings</li>
+        {:else if summary.numeric}
+          <li>Numbers {summary.numeric.min} to {summary.numeric.max}</li>
+        {:else}
+          <li>Other...</li>
+        {/if}
+      </ul>
     {/if}
   {/each}
 </ul>
-
-{#if legendRows}
-  <Legend rows={legendRows} />
-{/if}

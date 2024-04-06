@@ -15,7 +15,10 @@ export type Summary =
       other: { [key: string]: number };
     };
 
-export function summarize(objects: any[], maxCategoricalValues: number) {
+export function summarize(
+  objects: any[],
+  maxCategoricalValues: number,
+): Map<string, Summary> {
   // First extract all values for every key, recursing
   let valuesPerKey: { [key: string]: any[] } = {};
   for (let obj of objects) {
@@ -23,12 +26,14 @@ export function summarize(objects: any[], maxCategoricalValues: number) {
   }
 
   // Then process each value batch
+  let result = new Map();
   for (let [fullPath, values] of Object.entries(valuesPerKey)) {
     let summary = summarizeValues(values, maxCategoricalValues);
-    console.log({ fullPath, summary });
+    result.set(fullPath, summary);
   }
 
   // TODO Make it more efficient by doing that value processing in a streaming way
+  return result;
 }
 
 function scrapeValues(
