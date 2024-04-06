@@ -26,6 +26,6 @@
   },
   "dependencies": {
     "@zerodevx/svelte-json-view": "^1.0.9",
-    "svelte-maplibre": "^0.8.1"
+    "svelte-maplibre": "^0.8.3"
   }
 }
