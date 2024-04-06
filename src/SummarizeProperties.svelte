@@ -17,7 +17,16 @@
     legendRows = [];
   }
 
-  // TODO Handle nested keys
+  function makeGetter(path) {
+    let parts = path.split(".");
+    if (parts.length === 1) {
+      return ["get", path];
+    } else {
+      let key = parts.pop();
+      return ["get", key, makeGetter(parts.join("."))];
+    }
+  }
+
   function makeExpression(key: string) {
     let categories = summaries.get(key).categorical;
 
@@ -39,13 +48,14 @@
 
     legendRows = [];
 
+    let getter = makeGetter(key);
     let expr = ["case"];
     let i = 0;
     for (let [value, count] of categories) {
       let color = colors[i++ % colors.length];
       legendRows.push([`${value} (${count})`, color]);
 
-      expr.push(["==", ["get", key], value]);
+      expr.push(["==", getter, value]);
       expr.push(color);
     }
     // Fallback
