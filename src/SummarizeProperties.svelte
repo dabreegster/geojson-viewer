@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { summarize } from "./summarize";
   import Legend from "./Legend.svelte";
 
   export let input;
@@ -9,7 +10,9 @@
 
   // TODO Maybe https://www.npmjs.com/package/json-summary or similar?
 
-  $: keys = summarize(input);
+  $: keys = oldSummarize(input);
+
+  $: summarize(input);
 
   $: if (chosenKey) {
     colorBy = makeExpression(chosenKey);
@@ -18,7 +21,7 @@
     legendRows = [];
   }
 
-  function summarize(input): Set<string> {
+  function oldSummarize(input): Set<string> {
     let keys = new Set();
     for (let obj of input) {
       for (let [k, v] of Object.entries(obj)) {

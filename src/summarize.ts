@@ -1,8 +1,23 @@
-import * as fs from "fs";
+export type Summary =
+  | {
+      categorical: Map<string, number>;
+    }
+  | {
+      strings: number;
+    }
+  | {
+      numeric: {
+        min: number;
+        max: number;
+      };
+    }
+  | {
+      other: { [key: string]: number };
+    };
 
-function summarize(objects, maxCategoricalValues) {
+export function summarize(objects: any[], maxCategoricalValues: number) {
   // First extract all values for every key, recursing
-  let valuesPerKey = {};
+  let valuesPerKey: { [key: string]: any[] } = {};
   for (let obj of objects) {
     scrapeValues(valuesPerKey, "", obj);
   }
@@ -16,7 +31,11 @@ function summarize(objects, maxCategoricalValues) {
   // TODO Make it more efficient by doing that value processing in a streaming way
 }
 
-function scrapeValues(valuesPerKey, path, obj) {
+function scrapeValues(
+  valuesPerKey: { [key: string]: any[] },
+  path: string,
+  obj: any,
+) {
   for (let [key, value] of Object.entries(obj)) {
     let fullPath = path ? `${path}.${key}` : key;
     if (Array.isArray(value)) {
@@ -34,8 +53,8 @@ function scrapeValues(valuesPerKey, path, obj) {
   }
 }
 
-function summarizeValues(values, maxCategoricalValues) {
-  let counter = {};
+function summarizeValues(values: any[], maxCategoricalValues: number): Summary {
+  let counter: { [key: string]: number } = {};
   for (let value of values) {
     if (!counter[value]) {
       counter[value] = 0;
@@ -69,14 +88,5 @@ function summarizeValues(values, maxCategoricalValues) {
     };
   }
 
-  return { unknown: counter };
+  return { other: counter };
 }
-
-let gj = JSON.parse(
-  fs.readFileSync(
-    "/home/dabreegster/atip-scheme-data/all_schemes_output.geojson",
-    //"/home/dabreegster/osm2streets/tests/src/neukolln/geometry.json"
-    //"/home/dabreegster/Downloads/tobia/cycling_quality_index_epsg4326.geojson"
-  ),
-);
-summarize(gj.features.map((f) => f.properties));
