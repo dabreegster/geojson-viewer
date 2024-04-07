@@ -79,41 +79,44 @@
 </script>
 
 <p>{input.length.toLocaleString()} features</p>
-<p>Properties:</p>
-<ul>
-  {#each summaries.entries() as [key, summary]}
-    {#if chosenKey == key}
-      <li>
-        {key}
-        <button on:click={() => (chosenKey = null)}
-          >Stop coloring by this</button
-        >
-      </li>
-      <Legend rows={legendRows} />
-    {:else if chosenKey}
-      <li>{key}</li>
-    {:else if summary.kind == "categorical" && !key.includes("[]")}
-      <li>
-        {key} <button on:click={() => (chosenKey = key)}>Color by this</button>
-      </li>
-    {:else}
-      <li>{key}</li>
-    {/if}
+<details open>
+  <summary>Properties</summary>
+  <ul>
+    {#each summaries.entries() as [key, summary]}
+      {#if chosenKey == key}
+        <li>
+          {key}
+          <button on:click={() => (chosenKey = null)}
+            >Stop coloring by this</button
+          >
+        </li>
+        <Legend rows={legendRows} />
+      {:else if chosenKey}
+        <li>{key}</li>
+      {:else if summary.kind == "categorical" && !key.includes("[]")}
+        <li>
+          {key}
+          <button on:click={() => (chosenKey = key)}>Color by this</button>
+        </li>
+      {:else}
+        <li>{key}</li>
+      {/if}
 
-    {#if chosenKey != key}
-      <ul>
-        {#if summary.kind == "categorical"}
-          {#each summary.counts.entries() as [value, count]}
-            <li>{value}: {count}</li>
-          {/each}
-        {:else if summary.kind == "strings"}
-          <li>{summary.count} strings</li>
-        {:else if summary.kind == "numeric"}
-          <li>Numbers {summary.min} to {summary.max}</li>
-        {:else}
-          <li>Other...</li>
-        {/if}
-      </ul>
-    {/if}
-  {/each}
-</ul>
+      {#if chosenKey != key}
+        <ul>
+          {#if summary.kind == "categorical"}
+            {#each summary.counts.entries() as [value, count]}
+              <li>{value}: {count}</li>
+            {/each}
+          {:else if summary.kind == "strings"}
+            <li>{summary.count} strings</li>
+          {:else if summary.kind == "numeric"}
+            <li>Numbers {summary.min} to {summary.max}</li>
+          {:else}
+            <li>Other...</li>
+          {/if}
+        </ul>
+      {/if}
+    {/each}
+  </ul>
+</details>

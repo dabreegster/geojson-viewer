@@ -79,7 +79,8 @@
       <input bind:this={fileInput} on:change={loadFile} type="file" />
     </label>
 
-    <button on:click={zoomFit}>Zoom to fit</button>
+    <div><button on:click={zoomFit}>Zoom to fit</button></div>
+    <hr />
 
     {#if pinnedFeature}
       <JsonView json={pinnedFeature.properties} />
