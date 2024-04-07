@@ -1,7 +1,7 @@
 export type Summary =
   | {
       kind: "categorical";
-      counts: Map<string, number>;
+      counts: Map<string | number | boolean | null, number>;
     }
   | {
       kind: "strings";
@@ -14,7 +14,7 @@ export type Summary =
     }
   | {
       kind: "other";
-      counts: { [key: string]: number };
+      counts: Map<string | number | boolean | null, number>;
     };
 
 export function summarize(
@@ -61,17 +61,17 @@ function scrapeValues(
 }
 
 function summarizeValues(values: any[], maxCategoricalValues: number): Summary {
-  let counter: { [key: string]: number } = {};
+  let counter: Map<string | number | boolean | null, number> = new Map();
   for (let value of values) {
-    if (!counter[value]) {
-      counter[value] = 0;
+    if (!counter.has(value)) {
+      counter.set(value, 0);
     }
-    counter[value]++;
+    counter.set(value, counter.get(value)! + 1);
   }
 
-  if (Object.keys(counter).length < maxCategoricalValues) {
+  if ([...counter.keys()].length < maxCategoricalValues) {
     // Sort by frequency
-    let sorted = Object.entries(counter);
+    let sorted = [...counter.entries()];
     sorted.sort((a, b) => b[1] - a[1]);
 
     let counts = new Map();

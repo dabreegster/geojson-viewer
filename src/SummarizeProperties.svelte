@@ -65,6 +65,7 @@
       let color = colors[i++ % colors.length];
       legendRows.push([`${value} (${count})`, color]);
 
+      // @ts-expect-error TODO
       expr.push(value);
       expr.push(color);
     }
@@ -73,7 +74,7 @@
 
     legendRows = legendRows;
 
-    // @ts-expect-error TODO Who knows
+    // @ts-expect-error TODO
     return expr;
   }
 </script>
