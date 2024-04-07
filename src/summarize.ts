@@ -1,18 +1,20 @@
 export type Summary =
   | {
-      categorical: Map<string, number>;
+      kind: "categorical";
+      counts: Map<string, number>;
     }
   | {
-      strings: number;
+      kind: "strings";
+      count: number;
     }
   | {
-      numeric: {
-        min: number;
-        max: number;
-      };
+      kind: "numeric";
+      min: number;
+      max: number;
     }
   | {
-      other: { [key: string]: number };
+      kind: "other";
+      counts: { [key: string]: number };
     };
 
 export function summarize(
@@ -72,26 +74,25 @@ function summarizeValues(values: any[], maxCategoricalValues: number): Summary {
     let sorted = Object.entries(counter);
     sorted.sort((a, b) => b[1] - a[1]);
 
-    let result = new Map();
+    let counts = new Map();
     for (let [value, count] of sorted) {
-      result.set(value, count);
+      counts.set(value, count);
     }
 
-    return { categorical: result };
+    return { kind: "categorical", counts };
   }
 
   if (typeof values[0] == "string") {
-    return { strings: Object.keys(counter).length };
+    return { kind: "strings", count: Object.keys(counter).length };
   }
 
   if (typeof values[0] == "number") {
     return {
-      numeric: {
-        min: Math.min(...values),
-        max: Math.max(...values),
-      },
+      kind: "numeric",
+      min: Math.min(...values),
+      max: Math.max(...values),
     };
   }
 
-  return { other: counter };
+  return { kind: "other", counts: counter };
 }

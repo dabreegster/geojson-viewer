@@ -1,34 +1,44 @@
 <script lang="ts">
+  import type {
+    ExpressionSpecification,
+    DataDrivenPropertyValueSpecification,
+  } from "maplibre-gl";
   import { summarize } from "./summarize";
   import Legend from "./Legend.svelte";
 
   export let input: any[];
-  export let colorBy = "black";
+  export let colorBy: DataDrivenPropertyValueSpecification<string> = "black";
 
-  let chosenKey = null;
-  let legendRows = [];
+  let chosenKey: string | null = null;
+  let legendRows: [string, string][] = [];
 
   $: summaries = summarize(input, 15);
 
   $: if (chosenKey) {
-    colorBy = makeExpression(chosenKey);
+    colorBy = makeColorBy(chosenKey);
   } else {
     colorBy = "black";
     legendRows = [];
   }
 
-  function makeGetter(path) {
+  function makeGetter(path: string): ExpressionSpecification {
     let parts = path.split(".");
-    if (parts.length === 1) {
+    if (parts.length == 1) {
       return ["get", path];
     } else {
-      let key = parts.pop();
+      let key = parts.pop()!;
       return ["get", key, makeGetter(parts.join("."))];
     }
   }
 
-  function makeExpression(key: string) {
-    let categories = summaries.get(key).categorical;
+  function makeColorBy(
+    key: string,
+  ): DataDrivenPropertyValueSpecification<string> {
+    let summary = summaries.get(key)!;
+    if (summary.kind != "categorical") {
+      // Should be impossible
+      return "black";
+    }
 
     // Vivid from https://carto.com/carto-colors/
     let colors = [
@@ -48,14 +58,14 @@
 
     legendRows = [];
 
-    let getter = makeGetter(key);
-    let expr = ["case"];
+    let expr = ["match", makeGetter(key)];
+
     let i = 0;
-    for (let [value, count] of categories) {
+    for (let [value, count] of summary.counts) {
       let color = colors[i++ % colors.length];
       legendRows.push([`${value} (${count})`, color]);
 
-      expr.push(["==", getter, value]);
+      expr.push(value);
       expr.push(color);
     }
     // Fallback
@@ -63,6 +73,7 @@
 
     legendRows = legendRows;
 
+    // @ts-expect-error TODO Who knows
     return expr;
   }
 </script>
@@ -81,7 +92,7 @@
       <Legend rows={legendRows} />
     {:else if chosenKey}
       <li>{key}</li>
-    {:else if summary.categorical && !key.includes("[]")}
+    {:else if summary.kind == "categorical" && !key.includes("[]")}
       <li>
         {key} <button on:click={() => (chosenKey = key)}>Color by this</button>
       </li>
@@ -91,14 +102,14 @@
 
     {#if chosenKey != key}
       <ul>
-        {#if summary.categorical}
-          {#each summary.categorical.entries() as [value, count]}
+        {#if summary.kind == "categorical"}
+          {#each summary.counts.entries() as [value, count]}
             <li>{value}: {count}</li>
           {/each}
-        {:else if summary.strings}
-          <li>{summary.strings} strings</li>
-        {:else if summary.numeric}
-          <li>Numbers {summary.numeric.min} to {summary.numeric.max}</li>
+        {:else if summary.kind == "strings"}
+          <li>{summary.count} strings</li>
+        {:else if summary.kind == "numeric"}
+          <li>Numbers {summary.min} to {summary.max}</li>
         {:else}
           <li>Other...</li>
         {/if}

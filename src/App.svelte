@@ -1,6 +1,11 @@
 <script lang="ts">
+  import type { Feature, FeatureCollection } from "geojson";
   import { JsonView } from "@zerodevx/svelte-json-view";
-  import type { MapMouseEvent } from "maplibre-gl";
+  import type {
+    Map,
+    MapMouseEvent,
+    DataDrivenPropertyValueSpecification,
+  } from "maplibre-gl";
   import {
     FillLayer,
     GeoJSON,
@@ -16,11 +21,11 @@
     type: "FeatureCollection" as const,
     features: [],
   };
-  let gj = empty;
+  let gj: FeatureCollection = empty;
 
-  let map;
-  let pinnedFeature = null;
-  let colorBy = "black";
+  let map: Map;
+  let pinnedFeature: Feature | null = null;
+  let colorBy: DataDrivenPropertyValueSpecification<string> = "black";
 
   $: if (map) {
     map.on("click", onClick);
@@ -32,7 +37,7 @@
       layers: ["points", "lines", "polygons"],
     })) {
       // Find the original feature in the GJ, to avoid having to parse nested properties
-      pinnedFeature = gj.features.find((f) => f.id == rendered.id);
+      pinnedFeature = gj.features.find((f) => f.id == rendered.id)!;
       break;
     }
   }
