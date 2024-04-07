@@ -2,12 +2,16 @@
   import type {
     ExpressionSpecification,
     DataDrivenPropertyValueSpecification,
+    FilterSpecification,
   } from "maplibre-gl";
   import { summarize } from "./summarize";
   import Legend from "./Legend.svelte";
+  import Filters from "./Filters.svelte";
 
   export let input: any[];
-  export let colorBy: DataDrivenPropertyValueSpecification<string> = "black";
+
+  export let colorBy: DataDrivenPropertyValueSpecification<string>;
+  export let filter: FilterSpecification;
 
   let chosenKey: string | null = null;
   let legendRows: [string, string][] = [];
@@ -86,6 +90,9 @@
 </script>
 
 <p>{input.length.toLocaleString()} features</p>
+
+<Filters {summaries} bind:filter />
+
 <details open>
   <summary>Properties</summary>
   <ul>

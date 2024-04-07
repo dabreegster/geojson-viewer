@@ -6,6 +6,7 @@
     Map,
     MapMouseEvent,
     DataDrivenPropertyValueSpecification,
+    FilterSpecification,
   } from "maplibre-gl";
   import {
     FillLayer,
@@ -27,6 +28,7 @@
   let map: Map;
   let pinnedFeature: Feature | null = null;
   let colorBy: DataDrivenPropertyValueSpecification<string> = "black";
+  let filter: FilterSpecification = true;
 
   $: if (map) {
     map.on("click", onClick);
@@ -89,6 +91,7 @@
     <SummarizeProperties
       input={gj.features.map((f) => f.properties)}
       bind:colorBy
+      bind:filter
     />
   </div>
   <div slot="main" style="position:relative; width: 100%; height: 100vh;">
@@ -105,7 +108,7 @@
       <GeoJSON data={gj}>
         <FillLayer
           id="polygons"
-          filter={["==", ["geometry-type"], "Polygon"]}
+          filter={["all", ["==", ["geometry-type"], "Polygon"], filter]}
           manageHoverState
           eventsIfTopMost
           hoverCursor="pointer"
@@ -117,7 +120,7 @@
 
         <LineLayer
           id="lines"
-          filter={["==", ["geometry-type"], "LineString"]}
+          filter={["all", ["==", ["geometry-type"], "LineString"], filter]}
           manageHoverState
           eventsIfTopMost
           hoverCursor="pointer"
@@ -130,7 +133,7 @@
 
         <CircleLayer
           id="points"
-          filter={["==", ["geometry-type"], "Point"]}
+          filter={["all", ["==", ["geometry-type"], "Point"], filter]}
           manageHoverState
           eventsIfTopMost
           hoverCursor="pointer"
