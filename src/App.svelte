@@ -1,4 +1,5 @@
 <script lang="ts">
+  import bbox from "@turf/bbox";
   import type { Feature, FeatureCollection } from "geojson";
   import { JsonView } from "@zerodevx/svelte-json-view";
   import type {
@@ -60,6 +61,13 @@
       window.alert(`Bad input file: ${err}`);
     }
   }
+
+  function zoomFit() {
+    map?.fitBounds(bbox(gj) as [number, number, number, number], {
+      animate: false,
+      padding: 10,
+    });
+  }
 </script>
 
 <Layout>
@@ -71,7 +79,7 @@
       <input bind:this={fileInput} on:change={loadFile} type="file" />
     </label>
 
-    <p>Note feature IDs are overwritten</p>
+    <button on:click={zoomFit}>Zoom to fit</button>
 
     {#if pinnedFeature}
       <JsonView json={pinnedFeature.properties} />

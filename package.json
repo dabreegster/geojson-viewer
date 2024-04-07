@@ -25,6 +25,7 @@
     "vite": "^4.5.2"
   },
   "dependencies": {
+    "@turf/bbox": "^6.5.0",
     "@zerodevx/svelte-json-view": "^1.0.9",
     "svelte-maplibre": "^0.8.3"
   }
