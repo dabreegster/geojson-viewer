@@ -14,6 +14,10 @@
 
   $: summaries = summarize(input, 15);
 
+  $: if (input) {
+    chosenKey = null;
+  }
+
   $: if (chosenKey) {
     colorBy = makeColorBy(chosenKey);
   } else {
@@ -58,7 +62,9 @@
 
     legendRows = [];
 
-    let expr = ["match", makeGetter(key)];
+    // match would be nicer, but it can't handle a mix of null and non-null values
+    let expr = ["case"];
+    let getter = makeGetter(key);
 
     let i = 0;
     for (let [value, count] of summary.counts) {
@@ -66,7 +72,7 @@
       legendRows.push([`${value} (${count})`, color]);
 
       // @ts-expect-error TODO
-      expr.push(value);
+      expr.push(["==", getter, value]);
       expr.push(color);
     }
     // Fallback
