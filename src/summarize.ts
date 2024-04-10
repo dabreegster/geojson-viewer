@@ -1,3 +1,5 @@
+import type { ExpressionSpecification } from "maplibre-gl";
+
 export type Summary =
   | {
       kind: "categorical";
@@ -95,4 +97,14 @@ function summarizeValues(values: any[], maxCategoricalValues: number): Summary {
   }
 
   return { kind: "other", counts: counter };
+}
+
+export function makeGetter(path: string): ExpressionSpecification {
+  let parts = path.split(".");
+  if (parts.length == 1) {
+    return ["get", path];
+  } else {
+    let key = parts.pop()!;
+    return ["get", key, makeGetter(parts.join("."))];
+  }
 }

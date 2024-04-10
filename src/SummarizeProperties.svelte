@@ -4,7 +4,7 @@
     DataDrivenPropertyValueSpecification,
     FilterSpecification,
   } from "maplibre-gl";
-  import { summarize } from "./summarize";
+  import { summarize, makeGetter } from "./summarize";
   import Legend from "./Legend.svelte";
   import Filters from "./Filters.svelte";
 
@@ -28,16 +28,6 @@
   } else {
     colorBy = "black";
     legendRows = [];
-  }
-
-  function makeGetter(path: string): ExpressionSpecification {
-    let parts = path.split(".");
-    if (parts.length == 1) {
-      return ["get", path];
-    } else {
-      let key = parts.pop()!;
-      return ["get", key, makeGetter(parts.join("."))];
-    }
   }
 
   function makeColorBy(

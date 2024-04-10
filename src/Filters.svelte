@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { FilterSpecification } from "maplibre-gl";
-  import type { Summary } from "./summarize";
+  import { type Summary, makeGetter } from "./summarize";
 
   export let summaries: Map<string, Summary>;
 
@@ -25,9 +25,7 @@
 
     let expr = [anyOrAll];
     for (let [key, value] of expressions) {
-      // TODO move the makeGetter thing
-      // @ts-expect-error
-      expr.push(["==", ["get", key], value]);
+      expr.push(["==", makeGetter(key), value]);
     }
 
     // @ts-expect-error
@@ -70,7 +68,9 @@
 
   <ul>
     {#each expressions as [key, value]}
-      <li>{key} = {value} <button on:click={() => remove(key, value)}>X</button></li>
+      <li>
+        {key} = {value} <button on:click={() => remove(key, value)}>X</button>
+      </li>
     {/each}
   </ul>
 
