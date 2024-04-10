@@ -48,6 +48,10 @@
   function addExpr() {
     expressions = [...expressions, [newKey, newValue]];
   }
+
+  export function addFilter(key: string, value: string) {
+    expressions = [...expressions, [key, value]];
+  }
 </script>
 
 <details open>

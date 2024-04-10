@@ -13,6 +13,7 @@
   export let colorBy: DataDrivenPropertyValueSpecification<string>;
   export let filter: FilterSpecification;
 
+  let filters: Filters;
   let chosenKey: string | null = null;
   let legendRows: [string, string][] = [];
 
@@ -91,7 +92,7 @@
 
 <p>{input.length.toLocaleString()} features</p>
 
-<Filters {summaries} bind:filter />
+<Filters {summaries} bind:filter bind:this={filters} />
 
 <details open>
   <summary>Properties</summary>
@@ -120,7 +121,12 @@
         <ul>
           {#if summary.kind == "categorical"}
             {#each summary.counts.entries() as [value, count]}
-              <li>{value}: {count}</li>
+              <li>
+                {value}: {count}
+                <button on:click={() => filters.addFilter(key, value)}
+                  >Filter</button
+                >
+              </li>
             {/each}
           {:else if summary.kind == "strings"}
             <li>{summary.count} strings</li>
