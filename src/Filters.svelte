@@ -38,8 +38,8 @@
     expressions = [];
   }
 
-  function remove(key: string) {
-    expressions = expressions.filter(([k, _]) => k != key);
+  function remove(key: string, value: string) {
+    expressions = expressions.filter(([k, v]) => k != key || v != value);
   }
 
   // TODO Could be separate component, even
@@ -70,7 +70,7 @@
 
   <ul>
     {#each expressions as [key, value]}
-      <li>{key} = {value} <button on:click={() => remove(key)}>X</button></li>
+      <li>{key} = {value} <button on:click={() => remove(key, value)}>X</button></li>
     {/each}
   </ul>
 
