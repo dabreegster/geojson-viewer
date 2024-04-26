@@ -5,7 +5,7 @@
     FilterSpecification,
   } from "maplibre-gl";
   import { summarize, makeGetter } from "./summarize";
-  import Legend from "./Legend.svelte";
+  import { Legend } from "svelte-utils";
   import Filters from "./Filters.svelte";
 
   export let input: any[];

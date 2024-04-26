@@ -27,6 +27,7 @@
   "dependencies": {
     "@turf/bbox": "^6.5.0",
     "@zerodevx/svelte-json-view": "^1.0.9",
-    "svelte-maplibre": "^0.8.3"
+    "svelte-maplibre": "^0.8.3",
+    "svelte-utils": "github:a-b-street/svelte-utils"
   }
 }
