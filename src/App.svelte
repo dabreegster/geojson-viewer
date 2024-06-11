@@ -85,11 +85,11 @@
     <hr />
 
     {#if pinnedFeature}
-      <JsonView json={pinnedFeature.properties} />
+      <JsonView json={pinnedFeature.properties ?? {}} />
     {/if}
 
     <SummarizeProperties
-      input={gj.features.map((f) => f.properties)}
+      input={gj.features.map((f) => f.properties ?? {})}
       bind:colorBy
       bind:filter
     />
