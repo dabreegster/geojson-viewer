@@ -48,16 +48,21 @@
   let fileInput: HTMLInputElement;
   async function loadFile(e: Event) {
     try {
-      let text = await fileInput.files![0].text();
-      let json = JSON.parse(text);
+      gj.features = [];
+
+      // Read multiple files and merge features
+      for (let file of fileInput.files!) {
+        let text = await file.text();
+        let json = JSON.parse(text);
+        gj.features = gj.features.concat(json.features);
+      }
 
       // Overwrite feature IDs
       let id = 1;
-      for (let f of json.features) {
+      for (let f of gj.features) {
         f.id = id++;
       }
 
-      gj = json;
       pinnedFeature = null;
     } catch (err) {
       window.alert(`Bad input file: ${err}`);
@@ -78,7 +83,7 @@
 
     <label>
       Load a .geojson file
-      <input bind:this={fileInput} on:change={loadFile} type="file" />
+      <input bind:this={fileInput} on:change={loadFile} type="file" multiple />
     </label>
 
     <div><button on:click={zoomFit}>Zoom to fit</button></div>
