@@ -23,7 +23,7 @@
     type: "FeatureCollection" as const,
     features: [],
   };
-  let gj: FeatureCollection = empty;
+  let gj: FeatureCollection = JSON.parse(JSON.stringify(empty));
 
   let map: Map;
   let pinnedFeature: Feature | null = null;
