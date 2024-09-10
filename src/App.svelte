@@ -18,6 +18,7 @@
   } from "svelte-maplibre";
   import Layout from "./Layout.svelte";
   import SummarizeProperties from "./SummarizeProperties.svelte";
+  import { downloadGeneratedFile } from "svelte-utils";
 
   let empty = {
     type: "FeatureCollection" as const,
@@ -80,6 +81,18 @@
       padding: 10,
     });
   }
+
+  function downloadPinned() {
+    if (pinnedFeature) {
+      downloadGeneratedFile(
+        "feature.geojson",
+        JSON.stringify({
+          type: "FeatureCollection",
+          features: [pinnedFeature],
+        }),
+      );
+    }
+  }
 </script>
 
 <Layout>
@@ -96,6 +109,7 @@
 
     {#if pinnedFeature}
       <JsonView json={pinnedFeature.properties ?? {}} />
+      <button on:click={downloadPinned}>Download just this feature</button>
     {/if}
 
     <SummarizeProperties

@@ -1,6 +1,5 @@
 <script lang="ts">
   import type {
-    ExpressionSpecification,
     DataDrivenPropertyValueSpecification,
     FilterSpecification,
   } from "maplibre-gl";
