@@ -34,6 +34,11 @@
     map.on("click", onClick);
   }
 
+  // Reset pinnedFeature when filter changes
+  $: if (filter) {
+    pinnedFeature = null;
+  }
+
   function onClick(e: MapMouseEvent) {
     pinnedFeature = null;
     for (let rendered of map.queryRenderedFeatures(e.point, {

@@ -57,7 +57,11 @@
 
   <pre>{JSON.stringify(filter)}</pre>
 
-  <div><button on:click={clear}>Clear all filters</button></div>
+  <div>
+    <button on:click={clear} disabled={expressions.length == 0}
+      >Clear all filters</button
+    >
+  </div>
 
   <label>
     <input type="radio" bind:group={anyOrAll} value="any" />Any
