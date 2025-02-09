@@ -1,4 +1,5 @@
 <script lang="ts">
+  import osmtogeojson from "osmtogeojson";
   import bbox from "@turf/bbox";
   import type { Feature, FeatureCollection } from "geojson";
   import { JsonView } from "@zerodevx/svelte-json-view";
@@ -59,7 +60,11 @@
       // Read multiple files and merge features
       for (let file of fileInput.files!) {
         let text = await file.text();
-        let json = JSON.parse(text);
+        let json = file.name.endsWith(".osm.xml")
+          ? osmtogeojson(
+              new DOMParser().parseFromString(text, "application/xml"),
+            )
+          : JSON.parse(text);
         gj.features = gj.features.concat(json.features);
       }
 
@@ -100,7 +105,7 @@
     <h1>GeoJSON Viewer</h1>
 
     <label>
-      Load a .geojson file
+      Load a .geojson or .osm.xml file
       <input bind:this={fileInput} on:change={loadFile} type="file" multiple />
     </label>
 
