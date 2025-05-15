@@ -32,6 +32,22 @@
   let colorBy: DataDrivenPropertyValueSpecification<string> = "black";
   let filter: FilterSpecification = true;
 
+  async function loadFromURL() {
+    let params = new URLSearchParams(window.location.search);
+    if (params.has("load_url")) {
+      let resp = await fetch(params.get("load_url"));
+      let json = await resp.json();
+
+      // Overwrite feature IDs
+      let id = 1;
+      for (let f of json.features) {
+        f.id = id++;
+      }
+      gj = json;
+    }
+  }
+  loadFromURL();
+
   $: if (map) {
     map.on("click", onClick);
   }
