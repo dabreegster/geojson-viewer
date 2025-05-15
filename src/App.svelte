@@ -44,6 +44,7 @@
         f.id = id++;
       }
       gj = json;
+      zoomFit();
     }
   }
   loadFromURL();
@@ -91,6 +92,7 @@
       }
 
       pinnedFeature = null;
+      zoomFit();
     } catch (err) {
       window.alert(`Bad input file: ${err}`);
     }
