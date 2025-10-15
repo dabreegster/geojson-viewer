@@ -38,12 +38,19 @@
       let resp = await fetch(params.get("load_url"));
       let json = await resp.json();
 
-      // Overwrite feature IDs
-      let id = 1;
-      for (let f of json.features) {
-        f.id = id++;
+      if (json.type == "FeatureCollecton") {
+        // Overwrite feature IDs
+        let id = 1;
+        for (let f of json.features) {
+          f.id = id++;
+        }
+        gj = json;
+      } else if (json.type == "Feature") {
+        json.id = 1;
+        gj = JSON.parse(JSON.stringify(empty));
+        gj.features.push(json);
+        gj = gj;
       }
-      gj = json;
       zoomFit();
     }
   }
@@ -82,7 +89,11 @@
               new DOMParser().parseFromString(text, "application/xml"),
             )
           : JSON.parse(text);
-        gj.features = gj.features.concat(json.features);
+        if (json.type == "FeatureCollecton") {
+          gj.features = gj.features.concat(json.features);
+        } else if (json.type == "Feature") {
+          gj.features.push(json);
+        }
       }
 
       // Overwrite feature IDs
@@ -91,6 +102,7 @@
         f.id = id++;
       }
 
+      gj = gj;
       pinnedFeature = null;
       zoomFit();
     } catch (err) {
