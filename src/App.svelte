@@ -89,7 +89,7 @@
               new DOMParser().parseFromString(text, "application/xml"),
             )
           : JSON.parse(text);
-        if (json.type == "FeatureCollecton") {
+        if (json.type == "FeatureCollection") {
           gj.features = gj.features.concat(json.features);
         } else if (json.type == "Feature") {
           gj.features.push(json);
