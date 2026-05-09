@@ -128,7 +128,36 @@
       );
     }
   }
+
+  // You can paste a URL from OSM or other map apps that put the camera viewport in the hash. This
+  // will warp to that location for debugging convenience.
+  function onPaste(ev: ClipboardEvent) {
+    let tag = (ev.target as HTMLElement).tagName;
+    if (tag == "INPUT" || tag == "TEXTAREA") {
+      return;
+    }
+
+    // @ts-expect-error MDN example works
+    let paste = (ev.clipboardData || window.clipboardData).getData("text");
+    let hash = "";
+    if (paste.includes("#map=")) {
+      hash = paste.split("#map=")[1];
+    } else if (paste.includes("#")) {
+      hash = paste.split("#")[1];
+    }
+
+    let parts = hash.split("/").map(parseFloat);
+    if (parts.length == 3 && !parts.some(isNaN)) {
+      map.flyTo({
+        center: [parts[2], parts[1]],
+        zoom: parts[0],
+        duration: 100,
+      });
+    }
+  }
 </script>
+
+<svelte:window on:paste={onPaste} />
 
 <Layout>
   <div slot="left">
